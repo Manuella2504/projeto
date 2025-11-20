@@ -3,85 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Perfil | SAEPSaúde</title>
-
-    <style>
-        body {
-            font-family: Arial;
-            background: #f0f2f5;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            padding-top: 40px;
-        }
-
-        #card {
-            background: white;
-            width: 380px;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 15px;
-        }
-
-        h2 {
-            margin: 10px 0 5px 0;
-        }
-
-        p {
-            margin: 6px 0;
-            font-size: 15px;
-        }
-
-        #stats {
-            margin-top: 20px;
-            text-align: left;
-            background: #fafafa;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #d9534f;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 18px;
-            font-size: 15px;
-        }
-
-        button:hover {
-            background: #c9302c;
-        }
-
-        #erro {
-            margin-bottom: 15px;
-            color: #c0392b;
-            font-weight: bold;
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="views/styles/perfil.css">
 </head>
 <body>
 
 <div id="card">
 
     <p id="erro"></p>
-
     <img id="avatar" src="" alt="Avatar">
-
     <h2 id="nome"></h2>
     <p id="email"></p>
 
@@ -138,7 +67,7 @@
     carregarPerfil();
 </script>
 
-<script src="sidebar.js"></script>
+<script src="views/scripts/sidebar.js"></script>
 
 </body>
 </html>

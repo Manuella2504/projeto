@@ -3,101 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Atividades | SAEPSaúde</title>
-
-    <style>
-        body {
-            font-family: Arial;
-            background: #f0f2f5;
-            margin: 0;
-            padding: 20px;
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        #filtros {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        select {
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
-
-        #lista {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            max-width: 650px;
-            margin: auto;
-        }
-
-        .card {
-            background: white;
-            padding: 18px;
-            border-radius: 12px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        .topo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .topo img {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-        }
-
-        .titulo {
-            margin-top: 10px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .info {
-            margin-top: 8px;
-            color: #444;
-            font-size: 14px;
-        }
-
-        .like {
-            margin-top: 12px;
-            font-size: 20px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .like.liked {
-            color: #e63946;
-        }
-
-        #paginacao {
-            display: flex;
-            justify-content: center;
-            margin-top: 25px;
-            gap: 10px;
-        }
-
-        #paginacao button {
-            padding: 10px 15px;
-            border: none;
-            background: #0275d8;
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        #paginacao button:hover {
-            background: #025aa5;
-        }
-    </style>
+   <link rel="stylesheet" href="views/styles/atividade.css">
 </head>
 <body>
 
@@ -195,8 +101,6 @@
 
     carregarAtividades(1);
 </script>
-
-<script src="sidebar.js"></script>
-
+<script src="views/scripts/sidebar.js"></script>
 </body>
 </html>
