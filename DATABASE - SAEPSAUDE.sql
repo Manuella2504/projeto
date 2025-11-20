@@ -23,7 +23,7 @@ id_atividade INT PRIMARY KEY auto_increment not null,
 id_usuario INT not null,
 distancia_metros INT not null,
 duracao_minutos INT not null,
-calorias VARCHAR(100) not null,
+calorias INT not null,
 titulo VARCHAR(50) not null,
 tipo_atividade  ENUM('corrida',
 'caminhada','trilha') not null,
@@ -36,7 +36,6 @@ CREATE TABLE likes(
 id_like INT PRIMARY KEY auto_increment not null,
 id_usuario INT not null,
 id_atividade INT not null,
-avatar_url VARCHAR(100) null,
 data_criacao DATETIME not null default now(),
 
 FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
@@ -56,9 +55,11 @@ FOREIGN KEY (id_atividade) REFERENCES atividades(id_atividade)
 
 INSERT INTO usuarios (nome_usuario, email_usuario, senha_usuario)
 VALUES (
-    'exeemplo',
+    'exemplo',
     'exemplo@example.com',
     '1234567'
 );
+
+
 
 
