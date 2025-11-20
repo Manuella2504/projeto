@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const atividadeController = require("../controllers/atividadeController");
-const auth = require("../middleware/auth");
+const { authMiddleware, authOptional } = require("../middlewares/authMiddleware");
 
-router.post("/criar", auth, atividadeController.criar);
+router.post("/criar", authMiddleware, atividadeController.criar);
 
-router.get("/", atividadeController.listar);
+router.get("/", authOptional, atividadeController.listar);
 
 module.exports = router;

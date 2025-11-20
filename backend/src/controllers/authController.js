@@ -6,21 +6,24 @@ exports.login = async (req, res) => {
     const { email, senha } = req.body;
 
     try {
+        if (!email || !senha) {
+            return res.status(400).json({ erro: "Email e senha são obrigatórios." });
+        }
+
         const [rows] = await db.query(
             "SELECT * FROM usuarios WHERE email_usuario = ?",
             [email]
         );
 
         if (rows.length === 0) {
-            return res.status(400).json({ erro: "Email não encontrado" });
+            return res.status(400).json({ erro: "Email não encontrado." });
         }
 
         const usuario = rows[0];
 
         const senhaCorreta = await bcrypt.compare(senha, usuario.senha_usuario);
-
         if (!senhaCorreta) {
-            return res.status(400).json({ erro: "Senha incorreta" });
+            return res.status(400).json({ erro: "Senha incorreta." });
         }
 
         const token = jwt.sign(
@@ -41,7 +44,6 @@ exports.login = async (req, res) => {
         });
 
     } catch (error) {
-        console.log(error);
         return res.status(500).json({ erro: "Erro no servidor" });
     }
 };
