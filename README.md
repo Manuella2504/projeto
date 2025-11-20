@@ -74,33 +74,3 @@ npm run dev
 # Produção
 npm start
 ```
-
-Servidor rodando em: `http://localhost:3000`
-
-## 📚 Endpoints da API
-
-### 🔑 Autenticação
-```
-POST /api/auth/register  - Registrar usuário
-POST /api/auth/login     - Login
-```
-
-### 👤 Usuários
-```
-GET  /api/usuarios/:id   - Buscar usuário
-```
-
-### 🏃 Atividades
-```
-GET    /api/atividades           - Listar todas (público)
-GET    /api/atividades/usuario   - Listar do usuário (autenticado)
-POST   /api/atividades           - Criar atividade
-PUT    /api/atividades/:id       - Atualizar atividade
-DELETE /api/atividades/:id       - Deletar atividade
-```
-
-### ❤️ Likes
-```
-POST   /api/likes/:atividadeId   - Curtir/Descurtir
-GET    /api/likes/:atividadeId   - Verificar like
-```
