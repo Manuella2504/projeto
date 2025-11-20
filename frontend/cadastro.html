@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro | SAEPSaúde</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #container {
+            background: white;
+            width: 360px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            margin-top: 18px;
+            width: 100%;
+            padding: 12px;
+            background: #0275d8;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background: #025aa5;
+        }
+
+        #erro {
+            margin-top: 12px;
+            color: #c0392b;
+            text-align: center;
+            display: none;
+        }
+
+        #sucesso {
+            margin-top: 12px;
+            color: #27ae60;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <h2>Criar Conta</h2>
+
+    <input id="nome" type="text" placeholder="Nome completo">
+    <input id="email" type="email" placeholder="Email">
+    <input id="senha" type="password" placeholder="Senha">
+    <input id="avatar" type="text" placeholder="URL do avatar (opcional)">
+
+    <button onclick="cadastrar()">Cadastrar</button>
+
+    <p id="erro"></p>
+    <p id="sucesso"></p>
+</div>
+
+<script>
+    async function cadastrar() {
+        const nome = document.getElementById("nome").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const senha = document.getElementById("senha").value.trim();
+        const avatar_url = document.getElementById("avatar").value.trim();
+
+        const erroDiv = document.getElementById("erro");
+        const sucessoDiv = document.getElementById("sucesso");
+        erroDiv.style.display = "none";
+        sucessoDiv.style.display = "none";
+
+        if (!nome || !email || !senha) {
+            erroDiv.innerText = "Preencha todos os campos obrigatórios.";
+            erroDiv.style.display = "block";
+            return;
+        }
+
+        const dados = { nome_usuario: nome, email_usuario: email, senha_usuario: senha, avatar_url };
+
+        try {
+            const resp = await fetch("http://localhost:3000/usuarios/cadastrar", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dados)
+            });
+
+            const json = await resp.json();
+
+            if (!resp.ok) {
+                erroDiv.innerText = json.erro || "Erro ao cadastrar.";
+                erroDiv.style.display = "block";
+                return;
+            }
+
+            sucessoDiv.innerText = "Conta criada com sucesso! Redirecionando...";
+            sucessoDiv.style.display = "block";
+
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 1500);
+
+        } catch (e) {
+            erroDiv.innerText = "Erro ao conectar ao servidor.";
+            erroDiv.style.display = "block";
+        }
+    }
+</script>
+<script src="sidebar.js"></script>
+
+</body>
+</html>

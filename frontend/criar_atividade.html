@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Criar Atividade | SAEPSaúde</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-top: 40px;
+            margin: 0;
+        }
+
+        #card {
+            background: white;
+            width: 380px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 18px;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        #erro {
+            margin-top: 12px;
+            color: #c0392b;
+            text-align: center;
+            display: none;
+        }
+
+        #sucesso {
+            margin-top: 12px;
+            color: #27ae60;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="card">
+    <h2>Criar Atividade</h2>
+
+    <input id="titulo" type="text" placeholder="Título da atividade">
+
+    <select id="tipo">
+        <option value="">Selecione o tipo</option>
+        <option value="corrida">Corrida</option>
+        <option value="caminhada">Caminhada</option>
+        <option value="trilha">Trilha</option>
+    </select>
+
+    <input id="distancia" type="number" placeholder="Distância (em metros)">
+    <input id="duracao" type="number" placeholder="Duração (em minutos)">
+    <input id="calorias" type="number" placeholder="Calorias gastas">
+
+    <button onclick="criar()">Salvar</button>
+
+    <p id="erro"></p>
+    <p id="sucesso"></p>
+</div>
+
+<script>
+    async function criar() {
+        const titulo = document.getElementById("titulo").value.trim();
+        const tipo = document.getElementById("tipo").value;
+        const distancia = document.getElementById("distancia").value.trim();
+        const duracao = document.getElementById("duracao").value.trim();
+        const calorias = document.getElementById("calorias").value.trim();
+
+        const erroDiv = document.getElementById("erro");
+        const sucessoDiv = document.getElementById("sucesso");
+
+        erroDiv.style.display = "none";
+        sucessoDiv.style.display = "none";
+
+        if (!titulo || !tipo || !distancia || !duracao || !calorias) {
+            erroDiv.innerText = "Preencha todos os campos.";
+            erroDiv.style.display = "block";
+            return;
+        }
+
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            erroDiv.innerText = "Você precisa estar logado.";
+            erroDiv.style.display = "block";
+            return;
+        }
+
+        const dados = {
+            titulo,
+            tipo_atividade: tipo,
+            distancia_metros: distancia,
+            duracao_minutos: duracao,
+            calorias
+        };
+
+        try {
+            const resp = await fetch("http://localhost:3000/atividades/criar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + token
+                },
+                body: JSON.stringify(dados)
+            });
+
+            const json = await resp.json();
+
+            if (!resp.ok) {
+                erroDiv.innerText = json.erro || "Erro ao salvar.";
+                erroDiv.style.display = "block";
+                return;
+            }
+
+            sucessoDiv.innerText = "Atividade criada com sucesso!";
+            sucessoDiv.style.display = "block";
+
+            setTimeout(() => {
+                window.location.href = "atividades.html";
+            }, 1500);
+
+        } catch (e) {
+            erroDiv.innerText = "Erro ao conectar ao servidor.";
+            erroDiv.style.display = "block";
+        }
+    }
+</script>
+<script src="sidebar.js"></script>
+
+</body>
+</html>

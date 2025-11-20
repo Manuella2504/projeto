@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalhes da Atividade | SAEPSaúde</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 25px;
+        }
+
+        #card {
+            background: white;
+            max-width: 680px;
+            margin: auto;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        .topo {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .topo img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+        }
+
+        h2 {
+            margin-top: 10px;
+        }
+
+        .info {
+            margin-top: 15px;
+            line-height: 1.6;
+        }
+
+        .like {
+            font-size: 26px;
+            cursor: pointer;
+            user-select: none;
+            margin-top: 10px;
+        }
+
+        .like.liked {
+            color: #e63946;
+        }
+
+        #comentarios {
+            margin-top: 30px;
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        #comentarios h3 {
+            margin-top: 0;
+        }
+
+        .comentario {
+            background: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            resize: none;
+            margin-top: 10px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            border: none;
+            background: #0275d8;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #025aa5;
+        }
+    </style>
+</head>
+
+<body>
+
+<div id="card">
+
+    <div class="topo">
+        <img id="avatar">
+        <div>
+            <strong id="nome"></strong><br>
+            <small id="data"></small>
+        </div>
+    </div>
+
+    <h2 id="titulo"></h2>
+
+    <div class="info">
+        Tipo: <span id="tipo"></span><br>
+        Distância: <span id="distancia"></span> km<br>
+        Duração: <span id="duracao"></span> h<br>
+        Calorias: <span id="calorias"></span><br>
+    </div>
+
+    <div id="likeBtn" class="like" onclick="curtir()">❤</div>
+
+    <div id="comentarios">
+        <h3>Comentários</h3>
+
+        <div id="listaComentarios"></div>
+
+        <textarea id="textoComentario" placeholder="Escreva um comentário..."></textarea>
+        <button onclick="enviarComentario()">Enviar</button>
+    </div>
+
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    const token = localStorage.getItem("token");
+
+    if (!id) {
+        alert("ID da atividade não informado.");
+        window.location.href = "atividades.html";
+    }
+
+    async function carregarDetalhes() {
+        const resp = await fetch(`http://localhost:3000/atividades?id=${id}`, {
+            headers: token ? { "Authorization": "Bearer " + token } : {}
+        });
+
+        const dados = await resp.json();
+
+        if (!dados.length) {
+            alert("Atividade não encontrada.");
+            return;
+        }
+
+        const a = dados[0];
+
+        document.getElementById("avatar").src = a.avatar_url;
+        document.getElementById("nome").innerText = a.nome_usuario;
+        document.getElementById("data").innerText = a.data_criacao;
+        document.getElementById("titulo").innerText = a.titulo;
+        document.getElementById("tipo").innerText = a.tipo;
+        document.getElementById("distancia").innerText = a.distancia_km;
+        document.getElementById("duracao").innerText = a.duracao_horas;
+        document.getElementById("calorias").innerText = a.calorias;
+
+        if (a.liked_by_user) {
+            document.getElementById("likeBtn").classList.add("liked");
+        }
+
+        carregarComentarios();
+    }
+
+    async function carregarComentarios() {
+        const resp = await fetch(`http://localhost:3000/comentarios/${id}`);
+        const comentarios = await resp.json();
+
+        const lista = document.getElementById("listaComentarios");
+        lista.innerHTML = "";
+
+        comentarios.forEach(c => {
+            const div = document.createElement("div");
+            div.className = "comentario";
+            div.textContent = `${c.nome_usuario}: ${c.texto}`;
+            lista.appendChild(div);
+        });
+    }
+
+    async function enviarComentario() {
+        const texto = document.getElementById("textoComentario").value.trim();
+
+        if (!texto) {
+            alert("Digite algo antes de enviar.");
+            return;
+        }
+
+        if (!token) {
+            alert("Faça login para comentar.");
+            return;
+        }
+
+        const resp = await fetch(`http://localhost:3000/comentarios/${id}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+            },
+            body: JSON.stringify({ texto })
+        });
+
+        if (resp.ok) {
+            document.getElementById("textoComentario").value = "";
+            carregarComentarios();
+        }
+    }
+
+    async function curtir() {
+        if (!token) {
+            alert("Faça login para curtir.");
+            return;
+        }
+
+        const likeBtn = document.getElementById("likeBtn");
+
+        const resp = await fetch(`http://localhost:3000/likes/${id}`, {
+            method: "POST",
+            headers: { "Authorization": "Bearer " + token }
+        });
+
+        if (resp.ok) {
+            likeBtn.classList.toggle("liked");
+        }
+    }
+
+    carregarDetalhes();
+</script>
+<script src="sidebar.js"></script>
+
+</body>
+</html>

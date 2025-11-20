@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | SAEPSaúde</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #container {
+            background: white;
+            width: 360px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            margin-top: 18px;
+            width: 100%;
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        #erro {
+            margin-top: 15px;
+            color: #ff3333;
+            text-align: center;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <h2>Entrar no SAEPSaúde</h2>
+
+    <input id="email" type="email" placeholder="Email">
+    <input id="senha" type="password" placeholder="Senha">
+
+    <button onclick="login()">Entrar</button>
+
+    <p id="erro"></p>
+</div>
+
+<script>
+    async function login() {
+        const email = document.getElementById("email").value.trim();
+        const senha = document.getElementById("senha").value.trim();
+        const erroDiv = document.getElementById("erro");
+
+        erroDiv.style.display = "none";
+
+        if (!email || !senha) {
+            erroDiv.innerText = "Preencha todos os campos.";
+            erroDiv.style.display = "block";
+            return;
+        }
+
+        try {
+            const resp = await fetch("http://localhost:3000/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, senha })
+            });
+
+            const dados = await resp.json();
+
+            if (!resp.ok) {
+                erroDiv.innerText = dados.erro || "Erro ao fazer login.";
+                erroDiv.style.display = "block";
+                return;
+            }
+
+            localStorage.setItem("token", dados.token);
+
+            window.location.href = "perfil.html";
+
+        } catch (err) {
+            erroDiv.innerText = "Erro ao conectar ao servidor.";
+            erroDiv.style.display = "block";
+        }
+    }
+</script>
+<script src="sidebar.js"></script>
+</body>
+</html>

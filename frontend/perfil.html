@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Perfil | SAEPSaúde</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            padding-top: 40px;
+        }
+
+        #card {
+            background: white;
+            width: 380px;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            margin: 10px 0 5px 0;
+        }
+
+        p {
+            margin: 6px 0;
+            font-size: 15px;
+        }
+
+        #stats {
+            margin-top: 20px;
+            text-align: left;
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #d9534f;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 18px;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background: #c9302c;
+        }
+
+        #erro {
+            margin-bottom: 15px;
+            color: #c0392b;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="card">
+
+    <p id="erro"></p>
+
+    <img id="avatar" src="" alt="Avatar">
+
+    <h2 id="nome"></h2>
+    <p id="email"></p>
+
+    <div id="stats">
+        <p><strong>Total de atividades:</strong> <span id="atividades"></span></p>
+        <p><strong>Total de calorias:</strong> <span id="calorias"></span></p>
+    </div>
+
+    <button onclick="logout()">Sair</button>
+</div>
+
+
+<script>
+    async function carregarPerfil() {
+        const token = localStorage.getItem("token");
+        const erroDiv = document.getElementById("erro");
+
+        if (!token) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        try {
+            const resp = await fetch("http://localhost:3000/usuarios/perfil", {
+                headers: { "Authorization": "Bearer " + token }
+            });
+
+            const dados = await resp.json();
+
+            if (!resp.ok) {
+                erroDiv.style.display = "block";
+                erroDiv.innerText = "Sessão expirada. Faça login novamente.";
+                setTimeout(() => window.location.href = "login.html", 2000);
+                return;
+            }
+
+            document.getElementById("avatar").src = dados.avatar_url || "https://i.imgur.com/qaZr5Sw.png";
+            document.getElementById("nome").innerText = dados.nome_usuario;
+            document.getElementById("email").innerText = dados.email_usuario;
+            document.getElementById("atividades").innerText = dados.total_atividades;
+            document.getElementById("calorias").innerText = dados.total_calorias;
+
+        } catch (e) {
+            erroDiv.style.display = "block";
+            erroDiv.innerText = "Erro ao conectar ao servidor.";
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem("token");
+        window.location.href = "login.html";
+    }
+
+    carregarPerfil();
+</script>
+
+<script src="sidebar.js"></script>
+
+</body>
+</html>
