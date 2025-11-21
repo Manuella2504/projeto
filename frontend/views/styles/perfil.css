@@ -17,9 +17,8 @@ body {
     gap: 0;
 }
 
-/* COLUNA DO PERFIL */
 #profile-column {
-    background: linear-gradient(180deg, #0d47a1 0%, #01579b 100%);
+    background-color: #333333;
     color: #FFFFFF;
     display: flex;
     flex-direction: column;
@@ -71,7 +70,7 @@ body {
     font-size: 2em;
     font-weight: 700;
     margin-bottom: 5px;
-    color: #4fc3f7;
+    color: #FFFFFF;
 }
 
 .stat-label {
@@ -100,7 +99,46 @@ body {
     transition: all 0.3s ease;
     backdrop-filter: blur(5px);
 }
+/* ==================================================================
+   👇 ADICIONE ISSO NO FINAL DO SEU PERFIL.CSS PARA ARRUMAR OS CARDS 👇
+================================================================== */
 
+/* Alinha a foto pequena com o nome e data */
+.topo-card {
+    display: flex;
+    align-items: center;   /* Centraliza verticalmente */
+    gap: 12px;             /* Espaço entre a foto e o texto */
+    margin-bottom: 12px;   /* Espaço abaixo do cabeçalho */
+}
+
+/* ESTA É A CLASSE QUE CONSERTA A IMAGEM GIGANTE */
+.avatar-card {
+    width: 45px;           /* Largura fixa pequena */
+    height: 45px;          /* Altura igual à largura */
+    border-radius: 50%;    /* Faz ficar perfeitamente redonda */
+    object-fit: cover;     /* Corta a imagem para caber no círculo sem esticar */
+    border: 2px solid #e0e0e0; /* Uma borda fina e elegante */
+    background-color: #ccc; /* Cor de fundo enquanto carrega */
+    flex-shrink: 0;        /* Garante que a imagem não seja "esmagada" */
+}
+
+/* Ajuste fino para o texto ao lado da foto pequena */
+.topo-card div {
+    display: flex;
+    flex-direction: column;
+}
+
+.topo-card strong {
+    font-size: 1rem;
+    color: #333;
+}
+
+.topo-card .data {
+    font-size: 0.8rem;
+    color: #777;
+    margin: 0;
+}
+/* ================================================================== */
 #activity-button img {
     width: 22px;
     height: 22px;
