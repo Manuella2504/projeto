@@ -35,11 +35,11 @@
 
 <div class="botoes-exportar">
     <button class="btn-csv btn-atv" onclick="exportarCSV()">
-        📄 Exportar Atividades
+        Exportar Atividades
     </button>
     
     <button class="btn-csv btn-user" onclick="exportarUsuariosCSV()">
-        👥 Exportar Usuários
+        Exportar Usuários
     </button>
 </div>
 <div id="filtros">
@@ -137,7 +137,7 @@
     carregarAtividades(1);
 
 
-    /* 🔵 FUNÇÃO EXPORTAR ATIVIDADES 🔵 */
+
     async function exportarCSV() {
         const token = localStorage.getItem("token");
         const tipo = document.getElementById("tipo").value;
@@ -162,7 +162,7 @@
         }
     }
 
-    /* 🔵 NOVA FUNÇÃO: EXPORTAR USUÁRIOS 🔵 */
+
     async function exportarUsuariosCSV() {
         const token = localStorage.getItem("token");
         const url = "http://localhost:3000/usuarios/exportar";

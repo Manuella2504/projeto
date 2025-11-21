@@ -4,16 +4,16 @@ const csv = require("csv-parser");
 const db = require("../config/database");
 const bcrypt = require("bcrypt");
 
-// Função para converter string "1,5" do CSV para número 1.5
+
 const parseCSVNumber = (val) => {
     if (!val) return 0;
     return parseFloat(val.replace(',', '.')) || 0;
 };
 
-// IMPORTAR USUÁRIOS
+
 function importarUsuarios() {
     const results = [];
-    // Adicionado separator: ';' para ler CSVs brasileiros (Excel)
+
     fs.createReadStream(__dirname + "/usuarios.csv")
         .pipe(csv({ separator: ';' })) 
         .on("data", (data) => results.push(data))
@@ -21,7 +21,7 @@ function importarUsuarios() {
             console.log(`Lendo ${results.length} usuários...`);
             for (const row of results) {
                 try {
-                    if (!row.email_usuario) continue; // Pula linhas vazias
+                    if (!row.email_usuario) continue; 
                     
                     const senhaHash = await bcrypt.hash(row.senha_usuario, 10);
                     await db.query(
@@ -44,10 +44,9 @@ function importarUsuarios() {
         });
 }
 
-// IMPORTAR ATIVIDADES
+
 function importarAtividades() {
     const results = [];
-    // Adicionado separator: ';' 
     fs.createReadStream(__dirname + "/atividades.csv")
         .pipe(csv({ separator: ';' }))
         .on("data", (data) => results.push(data))
@@ -55,16 +54,14 @@ function importarAtividades() {
             console.log(`Lendo ${results.length} atividades...`);
             for (const row of results) {
                 try {
-                    // Verifica se as colunas existem (ajuste os nomes conforme seu CSV)
-                    // Se o seu CSV tem 'distancia_km', mude row.distancia para row.distancia_km
+
                     const distBruta = row.distancia || row.distancia_km || "0";
                     const durBruta = row.duracao || row.duracao_horas || "0";
 
-                    const distMetros = parseCSVNumber(distBruta); // Assume que o CSV já está em metros
-                    // SE O CSV ESTIVER EM KM, use: const distMetros = parseCSVNumber(distBruta) * 1000;
+                    const distMetros = parseCSVNumber(distBruta); 
 
-                    const durMinutos = parseCSVNumber(durBruta); // Assume que o CSV já está em minutos
-                    // SE O CSV ESTIVER EM HORAS, use: const durMinutos = parseCSVNumber(durBruta) * 60;
+
+                    const durMinutos = parseCSVNumber(durBruta); 
 
                     await db.query(
                         `INSERT INTO atividades 
@@ -89,4 +86,4 @@ function importarAtividades() {
 }
 
 importarUsuarios();
-setTimeout(importarAtividades, 3000); // Espera 3s para garantir que usuários existem
+setTimeout(importarAtividades, 3000); 

@@ -8,46 +8,73 @@
 
 function logout() {
     localStorage.removeItem("token");
+    localStorage.removeItem("usuario");
     window.location.href = "index.html";
 }
 
 let paginaAtual = 1;
 let tipoFiltro = "";
 const API = "http://localhost:3000";
+const FOTO_PADRAO = "assets/images/SAEPSaude.png"; 
+
 
 async function carregarUsuario() {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    const resp = await fetch(`${API}/usuarios`, {
-        headers: { "Authorization": "Bearer " + token }
-    });
+    try {
+        const resp = await fetch(`${API}/usuarios/perfil`, {
+            headers: { "Authorization": "Bearer " + token }
+        });
 
-    const dados = await resp.json();
+        if (!resp.ok) {
+            if(resp.status === 401 || resp.status === 403) logout();
+            return;
+        }
 
-    if (!resp.ok) {
-        logout();
-        return;
+        const dados = await resp.json();
+
+
+        document.getElementById("user-name").innerText = dados.nome_usuario || "Usuário";
+        
+        const avatarImg = document.getElementById("user-avatar");
+        
+
+        if (dados.avatar_url && dados.avatar_url.trim() !== "") {
+            avatarImg.src = dados.avatar_url;
+        } else {
+            avatarImg.src = FOTO_PADRAO;
+        }
+        
+
+        avatarImg.onerror = function() {
+            this.onerror = null; 
+            this.src = FOTO_PADRAO;
+        };
+
+    } catch (e) {
+        console.error("Erro ao carregar perfil:", e);
     }
-
-    document.getElementById("user-name").innerText = dados.nome_usuario;
-    document.getElementById("user-avatar").src = dados.avatar_url || "assets/images/SAEPSaude.png";
 }
 
 async function carregarContadores() {
     const token = localStorage.getItem("token");
 
-    const resp = await fetch(`${API}/atividades?pagina=1`, {
-        headers: token ? { "Authorization": "Bearer " + token } : {}
-    });
+    try {
+        const resp = await fetch(`${API}/atividades?pagina=1`, {
+            headers: token ? { "Authorization": "Bearer " + token } : {}
+        });
 
-    const atividades = await resp.json();
+        const atividades = await resp.json();
 
-    let totalCalorias = 0;
-    atividades.forEach(a => totalCalorias += Number(a.calorias));
+        let totalCalorias = 0;
+        atividades.forEach(a => totalCalorias += Number(a.calorias));
 
-    document.getElementById("qtd-atividades-empresa").innerText = atividades.length;
-    document.getElementById("qtd-calorias-empresa").innerText = totalCalorias;
+        document.getElementById("qtd-atividades-empresa").innerText = atividades.length;
+        document.getElementById("qtd-calorias-empresa").innerText = totalCalorias;
+    } catch (e) {
+        console.error("Erro contadores:", e);
+    }
 }
 
 async function carregarAtividades(pagina = 1) {
@@ -70,19 +97,25 @@ async function carregarAtividades(pagina = 1) {
         const card = document.createElement("div");
         card.classList.add("activity-card");
 
+  
+        const avatarSrc = (a.avatar_url && a.avatar_url.trim() !== "") ? a.avatar_url : FOTO_PADRAO;
+
+      
+        const dataFormatada = new Date(a.data_criacao).toLocaleDateString('pt-BR');
+
         card.innerHTML = `
             <div class="topo-card">
-                <img src="${a.avatar_url}" class="avatar-card">
+                <img src="${avatarSrc}" class="avatar-card" onerror="this.onerror=null;this.src='${FOTO_PADRAO}'">
                 <div>
                     <strong>${a.nome_usuario}</strong>
-                    <p class="data">${a.data_criacao}</p>
+                    <p class="data">${dataFormatada}</p>
                 </div>
             </div>
 
             <h3 class="titulo-card">${a.titulo}</h3>
 
             <p class="dados-card">
-                Tipo: <strong>${a.tipo}</strong><br>
+                Tipo: <strong>${a.tipo || a.tipo_atividade || 'Geral'}</strong><br>
                 Distância: ${a.distancia_km} km<br>
                 Duração: ${a.duracao_horas} horas<br>
                 Calorias: ${a.calorias}
@@ -141,6 +174,12 @@ function filterActivities(tipo) {
     document.querySelector(`[data-type="${tipo}"]`).classList.add("active");
 }
 
+function goToPage(direction) {
+    if (direction === 'next') paginaAtual++;
+    else if (direction === 'prev' && paginaAtual > 1) paginaAtual--;
+    carregarAtividades(paginaAtual);
+}
+
 function openModal(id) {
     document.getElementById(id).style.display = "block";
 }
@@ -148,6 +187,7 @@ function openModal(id) {
 function closeModal(id) {
     document.getElementById(id).style.display = "none";
 }
+
 
 carregarUsuario();
 carregarContadores();

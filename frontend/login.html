@@ -2,63 +2,86 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | SAEPSaúde</title>
     <link rel="stylesheet" href="views/styles/login.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; }
+        .login-container { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #0d47a1; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #1565c0; }
+        .error { color: red; text-align: center; margin-top: 10px; display: none; }
+        .links { text-align: center; margin-top: 15px; font-size: 0.9em; }
+        .links a { color: #0d47a1; text-decoration: none; }
+    </style>
 </head>
 <body>
 
-<div id="container">
-    <h2>Bem-vindo ao <span>SAEPSaúde</span></h2>
+<div class="login-container">
+    <h2 style="text-align: center; color: #0d47a1;">Login SAEPSaúde</h2>
+    
+    <form onsubmit="event.preventDefault(); entrar()">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="Digite seu email" required>
 
-    <input id="email" type="email" placeholder="Digite seu email">
-    <input id="senha" type="password" placeholder="Digite sua senha">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" placeholder="Digite sua senha" required>
 
-    <button onclick="login()">Entrar</button>
+        <button type="submit">Entrar</button>
+    </form>
 
-    <p id="erro"></p>
+    <p id="erro" class="error"></p>
 
-    <p class="link-cadastro">
-        Não tem conta? <a href="cadastro.html">Criar conta</a>
-    </p>
+    <div class="links">
+        <a href="cadastro.html">Não tem conta? Cadastre-se aqui</a>
+    </div>
 </div>
 
 <script>
-    async function login() {
-        const email = document.getElementById("email").value.trim();
-        const senha = document.getElementById("senha").value.trim();
-        const erroDiv = document.getElementById("erro");
+    async function entrar() {
+        const email = document.getElementById("email").value;
+        const senha = document.getElementById("senha").value;
+        const erro = document.getElementById("erro");
 
-        erroDiv.style.display = "none";
+        
+        erro.style.display = "none";
+        erro.innerText = "";
 
         if (!email || !senha) {
-            erroDiv.innerText = "Preencha todos os campos.";
-            erroDiv.style.display = "block";
+            erro.innerText = "⚠️ Preencha todos os campos.";
+            erro.style.display = "block";
             return;
         }
 
         try {
-            const resp = await fetch("http://localhost:3000/auth/login", {
+            const response = await fetch("http://localhost:3000/auth/login", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify({ email, senha })
             });
 
-            const dados = await resp.json();
+            const json = await response.json();
 
-            if (!resp.ok) {
-                erroDiv.innerText = dados.erro || "Erro ao fazer login.";
-                erroDiv.style.display = "block";
-                return;
+            if (response.ok) {
+              
+                localStorage.setItem("token", json.token);
+                localStorage.setItem("usuario", JSON.stringify(json.usuario));
+
+                
+                window.location.href = "atividades.html";
+            } else {
+                erro.innerText = "❌ " + (json.erro || "Email ou senha incorretos.");
+                erro.style.display = "block";
             }
 
-            localStorage.setItem("token", dados.token);
-
-            window.location.href = "perfil.html";
-
-        } catch (err) {
-            erroDiv.innerText = "Erro ao conectar ao servidor.";
-            erroDiv.style.display = "block";
+        } catch (e) {
+            console.error(e);
+            erro.innerText = "🌐 Erro de conexão com o servidor.";
+            erro.style.display = "block";
         }
     }
 </script>

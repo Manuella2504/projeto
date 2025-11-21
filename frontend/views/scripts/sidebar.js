@@ -1,5 +1,3 @@
-// SIDEBAR UNIVERSAL — SAEPSaúde
-
 (function () {
 
     const paginasSemSidebar = ["login.html", "cadastro.html"];

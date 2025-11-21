@@ -1,7 +1,6 @@
 const db = require("../config/database");
 const bcrypt = require("bcrypt");
 
-// Função auxiliar para formatar datas
 const formatarData = (dataISO) => {
     if (!dataISO) return "Data n/d";
     try {
@@ -142,16 +141,13 @@ exports.cadastrar = async (req, res) => {
     }
 };
 
-// =========================================================
-// 📌 NOVO: EXPORTAR CSV DE USUÁRIOS
-// =========================================================
 exports.exportarCSV = async (req, res) => {
     try {
         console.log("📄 Iniciando geração de CSV de Usuários...");
 
         const [dados] = await db.query("SELECT * FROM usuarios ORDER BY id_usuario DESC");
 
-        // Cabeçalho compatível com Excel (Ponto e vírgula)
+
         const header = "ID;Nome;Email;Avatar URL;Data Cadastro\n";
 
         const linhas = dados.map(u => {

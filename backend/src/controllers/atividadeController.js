@@ -1,35 +1,31 @@
 const db = require("../config/database");
 
-// Função para tratar números na entrada (ex: "1.500,50" -> 1500.50)
 const tratarNumero = (valor) => {
     if (!valor) return 0;
     if (typeof valor === 'number') return valor;
     return parseFloat(valor.toString().replace(/\./g, '').replace(',', '.')) || 0;
 };
 
-// Função segura para formatar datas
+
 const formatarData = (dataISO) => {
     if (!dataISO) return "Data n/d";
     try {
         const dataObj = new Date(dataISO);
         if (isNaN(dataObj.getTime())) return "Data Inválida";
         
-        // Retorna formato DD/MM/AAAA HH:MM:SS
+
         return dataObj.toLocaleString('pt-BR');
     } catch (e) {
         return "Erro Data";
     }
 };
 
-// =========================================================
-// 📌 CRIAR ATIVIDADE
-// =========================================================
 exports.criar = async (req, res) => {
     try {
         const id_usuario = req.id_usuario;
         const { titulo, tipo, tipo_atividade, distancia_metros, duracao_minutos, calorias } = req.body;
 
-        // Aceita tanto 'tipo' quanto 'tipo_atividade' vindo do front
+
         const tipoReal = tipo_atividade || tipo;
 
         if (!titulo || !tipoReal) {
@@ -55,9 +51,6 @@ exports.criar = async (req, res) => {
     }
 };
 
-// =========================================================
-// 📌 LISTAR ATIVIDADES
-// =========================================================
 exports.listar = async (req, res) => {
     try {
         const pagina = Number(req.query.pagina) || 1;
@@ -99,9 +92,6 @@ exports.listar = async (req, res) => {
     }
 };
 
-// =========================================================
-// 📌 EXPORTAR CSV (Corrigido e Blindado contra erros 500)
-// =========================================================
 exports.exportarCSV = async (req, res) => {
     try {
         console.log("📄 Iniciando geração de CSV...");
@@ -131,12 +121,12 @@ exports.exportarCSV = async (req, res) => {
 
         const [dados] = await db.query(query, params);
 
-        // Cabeçalho compatível com Excel (Ponto e vírgula)
+
         const header = "ID;Usuário;Título;Tipo;Distância (m);Duração (min);Calorias;Data Criada\n";
 
         const linhas = dados.map(a => {
-            // Formatação segura para evitar quebra do servidor
-            const nome = (a.nome_usuario || "Sem Nome").replace(/;/g, ""); // Remove ; do nome para não quebrar colunas
+
+            const nome = (a.nome_usuario || "Sem Nome").replace(/;/g, ""); 
             const titulo = (a.titulo || "Sem Título").replace(/;/g, "");
             const dataFormatada = formatarData(a.data_criacao);
 
@@ -152,7 +142,7 @@ exports.exportarCSV = async (req, res) => {
             ].join(";");
         }).join("\n");
 
-        const csvFinal = "\uFEFF" + header + linhas; // \uFEFF força UTF-8 com BOM para abrir acentos no Excel
+        const csvFinal = "\uFEFF" + header + linhas; 
 
         res.setHeader("Content-Type", "text/csv; charset=utf-8");
         res.setHeader("Content-Disposition", "attachment; filename=relatorio_atividades.csv");
@@ -162,7 +152,7 @@ exports.exportarCSV = async (req, res) => {
 
     } catch (error) {
         console.error("❌ Erro fatal exportar CSV:", error);
-        // Se der erro, evita travar o request sem resposta
+
         if (!res.headersSent) {
             return res.status(500).json({ erro: "Erro ao gerar arquivo CSV." });
         }
