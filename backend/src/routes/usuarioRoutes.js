@@ -5,6 +5,10 @@ const { authMiddleware } = require("../middlewares/authMiddleware");
 
 router.post("/cadastrar", usuarioController.cadastrar);
 router.get("/", usuarioController.listar);
+
+// 📌 Rota de Exportar CSV (Deve vir ANTES de /:id)
+router.get("/exportar", usuarioController.exportarCSV);
+
 router.get("/perfil", authMiddleware, usuarioController.perfil);
 router.get("/:id", usuarioController.buscarPorId);
 router.put("/:id", authMiddleware, usuarioController.atualizar);

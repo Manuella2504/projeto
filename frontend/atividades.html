@@ -4,15 +4,44 @@
     <meta charset="UTF-8">
     <title>Atividades | SAEPSaúde</title>
     <link rel="stylesheet" href="views/styles/atividade.css">
+    <style>
+        /* Estilo extra para alinhar os botões */
+        .botoes-exportar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .btn-csv {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-atv { background-color: #1976d2; }
+        .btn-atv:hover { background-color: #1565c0; }
+        
+        .btn-user { background-color: #2e7d32; } /* Verde para diferenciar */
+        .btn-user:hover { background-color: #1b5e20; }
+    </style>
 </head>
 <body>
 
 <h1>Atividades</h1>
 
-<!-- 🔵 BOTÃO EXPORTAR CSV AQUI -->
-<button id="exportar-csv" onclick="exportarCSV()">📄 Exportar CSV</button>
-<!-- 🔵 FIM DO BOTÃO -->
-
+<div class="botoes-exportar">
+    <button class="btn-csv btn-atv" onclick="exportarCSV()">
+        📄 Exportar Atividades
+    </button>
+    
+    <button class="btn-csv btn-user" onclick="exportarUsuariosCSV()">
+        👥 Exportar Usuários
+    </button>
+</div>
 <div id="filtros">
     <select id="tipo" onchange="carregarAtividades(1)">
         <option value="">Todos</option>
@@ -57,7 +86,7 @@
 
             card.innerHTML = `
                 <div class="topo">
-                    <img src="${a.avatar_url}">
+                    <img src="${a.avatar_url || 'https://via.placeholder.com/50'}">
                     <div>
                         <strong>${a.nome_usuario}</strong><br>
                         <small>${a.data_criacao}</small>
@@ -108,7 +137,7 @@
     carregarAtividades(1);
 
 
-    /* 🔵 FUNÇÃO EXPORTAR CSV 🔵 */
+    /* 🔵 FUNÇÃO EXPORTAR ATIVIDADES 🔵 */
     async function exportarCSV() {
         const token = localStorage.getItem("token");
         const tipo = document.getElementById("tipo").value;
@@ -116,15 +145,43 @@
         const url = new URL("http://localhost:3000/atividades/exportar");
         if (tipo) url.searchParams.append("tipo", tipo);
 
-        const resp = await fetch(url, {
-            headers: token ? { "Authorization": "Bearer " + token } : {}
-        });
+        try {
+            const resp = await fetch(url, {
+                headers: token ? { "Authorization": "Bearer " + token } : {}
+            });
+            
+            if(!resp.ok) throw new Error("Erro no download");
 
-        const blob = await resp.blob();
-        const link = document.createElement("a");
-        link.href = window.URL.createObjectURL(blob);
-        link.download = "atividades.csv"; 
-        link.click();
+            const blob = await resp.blob();
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = "relatorio_atividades.csv"; 
+            link.click();
+        } catch (e) {
+            alert("Erro ao baixar CSV de atividades.");
+        }
+    }
+
+    /* 🔵 NOVA FUNÇÃO: EXPORTAR USUÁRIOS 🔵 */
+    async function exportarUsuariosCSV() {
+        const token = localStorage.getItem("token");
+        const url = "http://localhost:3000/usuarios/exportar";
+
+        try {
+            const resp = await fetch(url, {
+                headers: token ? { "Authorization": "Bearer " + token } : {}
+            });
+
+            if(!resp.ok) throw new Error("Erro no download");
+
+            const blob = await resp.blob();
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = "relatorio_usuarios.csv"; 
+            link.click();
+        } catch (e) {
+            alert("Erro ao baixar CSV de usuários.");
+        }
     }
 </script>
 

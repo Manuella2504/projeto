@@ -1,22 +1,50 @@
 const db = require("../config/database");
 
+// Função para tratar números na entrada (ex: "1.500,50" -> 1500.50)
+const tratarNumero = (valor) => {
+    if (!valor) return 0;
+    if (typeof valor === 'number') return valor;
+    return parseFloat(valor.toString().replace(/\./g, '').replace(',', '.')) || 0;
+};
+
+// Função segura para formatar datas
+const formatarData = (dataISO) => {
+    if (!dataISO) return "Data n/d";
+    try {
+        const dataObj = new Date(dataISO);
+        if (isNaN(dataObj.getTime())) return "Data Inválida";
+        
+        // Retorna formato DD/MM/AAAA HH:MM:SS
+        return dataObj.toLocaleString('pt-BR');
+    } catch (e) {
+        return "Erro Data";
+    }
+};
+
 // =========================================================
 // 📌 CRIAR ATIVIDADE
 // =========================================================
 exports.criar = async (req, res) => {
     try {
         const id_usuario = req.id_usuario;
-        const { titulo, tipo, distancia_km, duracao_horas, calorias } = req.body;
+        const { titulo, tipo, tipo_atividade, distancia_metros, duracao_minutos, calorias } = req.body;
 
-        if (!titulo || !tipo) {
+        // Aceita tanto 'tipo' quanto 'tipo_atividade' vindo do front
+        const tipoReal = tipo_atividade || tipo;
+
+        if (!titulo || !tipoReal) {
             return res.status(400).json({ erro: "Título e tipo são obrigatórios." });
         }
 
+        const dist = tratarNumero(distancia_metros);
+        const dur = tratarNumero(duracao_minutos);
+        const cal = tratarNumero(calorias);
+
         await db.query(
             `INSERT INTO atividades 
-                (id_usuario, titulo, tipo, distancia_km, duracao_horas, calorias)
+                (id_usuario, titulo, tipo_atividade, distancia_metros, duracao_minutos, calorias)
              VALUES (?, ?, ?, ?, ?, ?)`,
-            [id_usuario, titulo, tipo, distancia_km, duracao_horas, calorias]
+            [id_usuario, titulo, tipoReal, dist, dur, cal]
         );
 
         return res.status(201).json({ mensagem: "Atividade criada com sucesso." });
@@ -28,7 +56,7 @@ exports.criar = async (req, res) => {
 };
 
 // =========================================================
-// 📌 LISTAR ATIVIDADES (com tipo + paginação)
+// 📌 LISTAR ATIVIDADES
 // =========================================================
 exports.listar = async (req, res) => {
     try {
@@ -38,7 +66,16 @@ exports.listar = async (req, res) => {
         const tipo = req.query.tipo || "";
 
         let query = `
-            SELECT a.*, u.nome_usuario, u.avatar_url
+            SELECT 
+                a.id_atividade,
+                a.titulo,
+                a.tipo_atividade AS tipo, 
+                a.distancia_metros,
+                a.duracao_minutos,
+                a.calorias,
+                a.data_criacao,
+                u.nome_usuario, 
+                u.avatar_url
             FROM atividades a
             JOIN usuarios u ON a.id_usuario = u.id_usuario
         `;
@@ -46,7 +83,7 @@ exports.listar = async (req, res) => {
         const params = [];
 
         if (tipo) {
-            query += " WHERE a.tipo = ? ";
+            query += " WHERE a.tipo_atividade = ? ";
             params.push(tipo);
         }
 
@@ -63,13 +100,12 @@ exports.listar = async (req, res) => {
 };
 
 // =========================================================
-// 📌 EXPORTAR CSV - MELHORADO
+// 📌 EXPORTAR CSV (Corrigido e Blindado contra erros 500)
 // =========================================================
 exports.exportarCSV = async (req, res) => {
     try {
-        console.log("📄 Iniciando exportação de CSV...");
+        console.log("📄 Iniciando geração de CSV...");
 
-        // Busca opcionalmente por tipo
         const tipo = req.query.tipo || "";
         
         let query = `
@@ -77,72 +113,58 @@ exports.exportarCSV = async (req, res) => {
                 a.id_atividade,
                 u.nome_usuario,
                 a.titulo,
-                a.tipo,
-                a.distancia_km,
-                a.duracao_horas,
+                a.tipo_atividade,
+                a.distancia_metros,
+                a.duracao_minutos,
                 a.calorias,
-                DATE_FORMAT(a.data_criacao, '%d/%m/%Y %H:%i:%s') as data_criacao
+                a.data_criacao
             FROM atividades a
             JOIN usuarios u ON a.id_usuario = u.id_usuario
         `;
 
         const params = [];
-
         if (tipo) {
-            query += " WHERE a.tipo = ?";
+            query += " WHERE a.tipo_atividade = ?";
             params.push(tipo);
         }
-
         query += " ORDER BY a.id_atividade DESC";
 
         const [dados] = await db.query(query, params);
 
-        console.log(`✅ Encontrados ${dados.length} registros para exportar`);
+        // Cabeçalho compatível com Excel (Ponto e vírgula)
+        const header = "ID;Usuário;Título;Tipo;Distância (m);Duração (min);Calorias;Data Criada\n";
 
-        if (dados.length === 0) {
-            return res.status(400).json({ erro: "Nenhuma atividade encontrada para exportar." });
-        }
+        const linhas = dados.map(a => {
+            // Formatação segura para evitar quebra do servidor
+            const nome = (a.nome_usuario || "Sem Nome").replace(/;/g, ""); // Remove ; do nome para não quebrar colunas
+            const titulo = (a.titulo || "Sem Título").replace(/;/g, "");
+            const dataFormatada = formatarData(a.data_criacao);
 
-        // Cabeçalho do CSV
-        const header = [
-            "ID",
-            "Usuário",
-            "Título",
-            "Tipo",
-            "Distância (km)",
-            "Duração (h)",
-            "Calorias",
-            "Data"
-        ].join(";") + "\n";
+            return [
+                a.id_atividade,
+                nome,
+                titulo,
+                a.tipo_atividade || "Outro",
+                a.distancia_metros || 0,
+                a.duracao_minutos || 0,
+                a.calorias || 0,
+                dataFormatada
+            ].join(";");
+        }).join("\n");
 
-        // Linhas do CSV
-        const linhas = dados
-            .map(a =>
-                [
-                    a.id_atividade,
-                    `"${a.nome_usuario}"`, // Aspas para evitar problemas com vírgulas/ponto-e-vírgula
-                    `"${a.titulo}"`,
-                    a.tipo,
-                    a.distancia_km || 0,
-                    a.duracao_horas || 0,
-                    a.calorias || 0,
-                    a.data_criacao
-                ].join(";")
-            )
-            .join("\n");
+        const csvFinal = "\uFEFF" + header + linhas; // \uFEFF força UTF-8 com BOM para abrir acentos no Excel
 
-        const csv = header + linhas;
-
-        // Configurar headers HTTP para download
         res.setHeader("Content-Type", "text/csv; charset=utf-8");
-        res.setHeader("Content-Disposition", "attachment; filename=atividades.csv");
-
-        console.log("✅ CSV gerado com sucesso!");
-
-        return res.send("\uFEFF" + csv); // BOM UTF-8 para Excel reconhecer acentos
+        res.setHeader("Content-Disposition", "attachment; filename=relatorio_atividades.csv");
+        
+        console.log("✅ CSV gerado e enviado.");
+        return res.send(csvFinal);
 
     } catch (error) {
-        console.error("❌ Erro ao exportar CSV:", error);
-        return res.status(500).json({ erro: "Erro ao exportar CSV." });
+        console.error("❌ Erro fatal exportar CSV:", error);
+        // Se der erro, evita travar o request sem resposta
+        if (!res.headersSent) {
+            return res.status(500).json({ erro: "Erro ao gerar arquivo CSV." });
+        }
     }
 };

@@ -1,4 +1,17 @@
 const db = require("../config/database");
+const bcrypt = require("bcrypt");
+
+// Função auxiliar para formatar datas
+const formatarData = (dataISO) => {
+    if (!dataISO) return "Data n/d";
+    try {
+        const dataObj = new Date(dataISO);
+        if (isNaN(dataObj.getTime())) return "Data Inválida";
+        return dataObj.toLocaleString('pt-BR');
+    } catch (e) {
+        return "Erro Data";
+    }
+};
 
 exports.listar = async (req, res) => {
     try {
@@ -96,7 +109,6 @@ exports.deletar = async (req, res) => {
         return res.status(500).json({ erro: "Erro ao deletar usuário." });
     }
 };
-const bcrypt = require("bcrypt");
 
 exports.cadastrar = async (req, res) => {
     const { nome_usuario, email_usuario, senha_usuario, avatar_url } = req.body;
@@ -127,5 +139,47 @@ exports.cadastrar = async (req, res) => {
 
     } catch (e) {
         return res.status(500).json({ erro: "Erro ao cadastrar usuário." });
+    }
+};
+
+// =========================================================
+// 📌 NOVO: EXPORTAR CSV DE USUÁRIOS
+// =========================================================
+exports.exportarCSV = async (req, res) => {
+    try {
+        console.log("📄 Iniciando geração de CSV de Usuários...");
+
+        const [dados] = await db.query("SELECT * FROM usuarios ORDER BY id_usuario DESC");
+
+        // Cabeçalho compatível com Excel (Ponto e vírgula)
+        const header = "ID;Nome;Email;Avatar URL;Data Cadastro\n";
+
+        const linhas = dados.map(u => {
+            const nome = (u.nome_usuario || "Sem Nome").replace(/;/g, ""); 
+            const email = (u.email_usuario || "").replace(/;/g, "");
+            const avatar = (u.avatar_url || "Sem foto").replace(/;/g, "");
+            const dataFormatada = formatarData(u.data_criacao);
+
+            return [
+                u.id_usuario,
+                nome,
+                email,
+                avatar,
+                dataFormatada
+            ].join(";");
+        }).join("\n");
+
+        const csvFinal = "\uFEFF" + header + linhas; 
+
+        res.setHeader("Content-Type", "text/csv; charset=utf-8");
+        res.setHeader("Content-Disposition", "attachment; filename=relatorio_usuarios.csv");
+        
+        return res.send(csvFinal);
+
+    } catch (error) {
+        console.error("❌ Erro fatal exportar CSV Usuários:", error);
+        if (!res.headersSent) {
+            return res.status(500).json({ erro: "Erro ao gerar arquivo CSV de usuários." });
+        }
     }
 };
