@@ -6,5 +6,7 @@ const { authMiddleware, authOptional } = require("../middlewares/authMiddleware"
 router.post("/criar", authMiddleware, atividadeController.criar);
 
 router.get("/", authOptional, atividadeController.listar);
+router.get("/atividades/exportar", atividadeController.exportarCSV);
+
 
 module.exports = router;

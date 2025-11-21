@@ -9,6 +9,17 @@
 
 <h1>Atividades</h1>
 
+<!-- 🔵 BOTÃO EXPORTAR CSV AQUI -->
+<button id="exportar-csv" onclick="exportarCSV()">📄 Exportar CSV</button>
+<!-- 🔵 FIM DO BOTÃO -->
+
+<!-- 🔵 FORMULÁRIO DE IMPORTAÇÃO CSV -->
+<form action="http://localhost:3000/importar/csv" method="POST" enctype="multipart/form-data" id="importar-form">
+    <h3>Importar dados (CSV)</h3>
+    <input type="file" name="arquivo" accept=".csv" required>
+    <button type="submit">Importar dados</button>
+</form>
+
 <div id="filtros">
     <select id="tipo" onchange="carregarAtividades(1)">
         <option value="">Todos</option>
@@ -102,6 +113,26 @@
     }
 
     carregarAtividades(1);
+
+
+    /* 🔵 FUNÇÃO EXPORTAR CSV 🔵 */
+    async function exportarCSV() {
+        const token = localStorage.getItem("token");
+        const tipo = document.getElementById("tipo").value;
+
+        const url = new URL("http://localhost:3000/atividades/exportar");
+        if (tipo) url.searchParams.append("tipo", tipo);
+
+        const resp = await fetch(url, {
+            headers: token ? { "Authorization": "Bearer " + token } : {}
+        });
+
+        const blob = await resp.blob();
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = "atividades.csv"; 
+        link.click();
+    }
 </script>
 
 <script src="views/scripts/sidebar.js"></script>
