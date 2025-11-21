@@ -1,6 +1,4 @@
 const db = require("../config/database");
-const fs = require("fs");
-const path = require("path");
 
 // =========================================================
 // 📌 CRIAR ATIVIDADE
@@ -65,11 +63,16 @@ exports.listar = async (req, res) => {
 };
 
 // =========================================================
-// 📌 EXPORTAR CSV
+// 📌 EXPORTAR CSV - MELHORADO
 // =========================================================
 exports.exportarCSV = async (req, res) => {
     try {
-        const [dados] = await db.query(`
+        console.log("📄 Iniciando exportação de CSV...");
+
+        // Busca opcionalmente por tipo
+        const tipo = req.query.tipo || "";
+        
+        let query = `
             SELECT 
                 a.id_atividade,
                 u.nome_usuario,
@@ -78,16 +81,29 @@ exports.exportarCSV = async (req, res) => {
                 a.distancia_km,
                 a.duracao_horas,
                 a.calorias,
-                a.data_criacao
+                DATE_FORMAT(a.data_criacao, '%d/%m/%Y %H:%i:%s') as data_criacao
             FROM atividades a
             JOIN usuarios u ON a.id_usuario = u.id_usuario
-            ORDER BY a.id_atividade DESC
-        `);
+        `;
+
+        const params = [];
+
+        if (tipo) {
+            query += " WHERE a.tipo = ?";
+            params.push(tipo);
+        }
+
+        query += " ORDER BY a.id_atividade DESC";
+
+        const [dados] = await db.query(query, params);
+
+        console.log(`✅ Encontrados ${dados.length} registros para exportar`);
 
         if (dados.length === 0) {
             return res.status(400).json({ erro: "Nenhuma atividade encontrada para exportar." });
         }
 
+        // Cabeçalho do CSV
         const header = [
             "ID",
             "Usuário",
@@ -99,16 +115,17 @@ exports.exportarCSV = async (req, res) => {
             "Data"
         ].join(";") + "\n";
 
+        // Linhas do CSV
         const linhas = dados
             .map(a =>
                 [
                     a.id_atividade,
-                    a.nome_usuario,
-                    a.titulo,
+                    `"${a.nome_usuario}"`, // Aspas para evitar problemas com vírgulas/ponto-e-vírgula
+                    `"${a.titulo}"`,
                     a.tipo,
-                    a.distancia_km,
-                    a.duracao_horas,
-                    a.calorias,
+                    a.distancia_km || 0,
+                    a.duracao_horas || 0,
+                    a.calorias || 0,
                     a.data_criacao
                 ].join(";")
             )
@@ -116,13 +133,16 @@ exports.exportarCSV = async (req, res) => {
 
         const csv = header + linhas;
 
-        res.setHeader("Content-Type", "text/csv");
+        // Configurar headers HTTP para download
+        res.setHeader("Content-Type", "text/csv; charset=utf-8");
         res.setHeader("Content-Disposition", "attachment; filename=atividades.csv");
 
-        return res.send(csv);
+        console.log("✅ CSV gerado com sucesso!");
+
+        return res.send("\uFEFF" + csv); // BOM UTF-8 para Excel reconhecer acentos
 
     } catch (error) {
-        console.error("Erro ao exportar CSV:", error);
+        console.error("❌ Erro ao exportar CSV:", error);
         return res.status(500).json({ erro: "Erro ao exportar CSV." });
     }
 };
