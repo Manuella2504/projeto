@@ -13,13 +13,6 @@
 <button id="exportar-csv" onclick="exportarCSV()">📄 Exportar CSV</button>
 <!-- 🔵 FIM DO BOTÃO -->
 
-<!-- 🔵 FORMULÁRIO DE IMPORTAÇÃO CSV -->
-<form action="http://localhost:3000/importar/csv" method="POST" enctype="multipart/form-data" id="importar-form">
-    <h3>Importar dados (CSV)</h3>
-    <input type="file" name="arquivo" accept=".csv" required>
-    <button type="submit">Importar dados</button>
-</form>
-
 <div id="filtros">
     <select id="tipo" onchange="carregarAtividades(1)">
         <option value="">Todos</option>

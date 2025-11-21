@@ -1,145 +1,277 @@
-
 :root {
-    --azul-escuro: #143258;
-    --azul: #2A6FF2;
-    --azul-hover: #1E5FFF;
-    --cinza-bg: #f0f2f5;
-    --cinza-card: #ffffff;
-    --cinza-borda: #dbe3ee;
-    --texto: #333;
+    --azul-escuro: #0A2540;
+    --azul-medio: #1E5FFF;
+    --azul-claro: #4A90FF;
+    --azul-hover: #1653E0;
+    --azul-suave: #E8F2FF;
+    --cinza-bg: #F5F8FA;
+    --cinza-card: #FFFFFF;
+    --cinza-borda: #D1DBE8;
+    --cinza-texto: #556B82;
+    --texto: #1A2B3D;
+    --sucesso: #22C55E;
+    --sombra-card: rgba(30, 95, 255, 0.08);
 }
 
+* {
+    box-sizing: border-box;
+}
 
 body {
-    font-family: Arial;
-    background: var(--cinza-bg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(135deg, var(--azul-suave) 0%, var(--cinza-bg) 100%);
     margin: 0;
     padding: 20px;
+    min-height: 100vh;
+    color: var(--texto);
 }
 
 h1 {
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 35px;
     color: var(--azul-escuro);
-    font-size: 26px;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* Botão Exportar CSV */
+#exportar-csv {
+    display: block;
+    margin: 0 auto 25px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--azul-medio) 0%, var(--azul-claro) 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(30, 95, 255, 0.2);
+}
+
+#exportar-csv:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(30, 95, 255, 0.3);
+}
+
+#exportar-csv:active {
+    transform: translateY(0);
 }
 
 
+
+/* Filtros */
 #filtros {
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
 }
 
 select {
-    padding: 10px 14px;
-    border-radius: 8px;
-    border: 1px solid var(--cinza-borda);
-    background: #fff;
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: 2px solid var(--cinza-borda);
+    background: var(--cinza-card);
     font-size: 15px;
+    font-weight: 500;
+    color: var(--texto);
     outline: none;
-    transition: 0.2s;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-width: 180px;
 }
 
 select:hover {
-    border-color: var(--azul);
+    border-color: var(--azul-claro);
+    background: var(--azul-suave);
 }
 
+select:focus {
+    border-color: var(--azul-medio);
+    box-shadow: 0 0 0 3px rgba(30, 95, 255, 0.1);
+}
 
+/* Lista de Atividades */
 #lista {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 20px;
     max-width: 650px;
     margin: auto;
 }
 
 .card {
     background: var(--cinza-card);
-    padding: 20px;
-    border-radius: 14px;
+    padding: 24px;
+    border-radius: 16px;
     border: 1px solid var(--cinza-borda);
-    box-shadow: 0 3px 10px rgba(0,0,0,0.07);
-    transition: 0.2s ease;
+    box-shadow: 0 4px 16px var(--sombra-card);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--azul-medio) 0%, var(--azul-claro) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(30, 95, 255, 0.15);
+    border-color: var(--azul-claro);
+}
+
+.card:hover::before {
+    opacity: 1;
 }
 
 .topo {
     display: flex;
     align-items: center;
     gap: 14px;
+    margin-bottom: 16px;
 }
 
 .topo img {
-    width: 58px;
-    height: 58px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
-    border: 2px solid var(--azul);
+    border: 3px solid var(--azul-medio);
+    box-shadow: 0 2px 8px rgba(30, 95, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.card:hover .topo img {
+    transform: scale(1.05);
+    border-color: var(--azul-claro);
+}
+
+.topo strong {
+    color: var(--azul-escuro);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.topo small {
+    color: var(--cinza-texto);
+    font-size: 13px;
 }
 
 .titulo {
-    margin-top: 12px;
-    font-size: 19px;
-    font-weight: bold;
+    margin-top: 14px;
+    font-size: 20px;
+    font-weight: 700;
     color: var(--azul-escuro);
+    line-height: 1.3;
+    letter-spacing: -0.3px;
 }
 
 .info {
-    margin-top: 10px;
-    color: #555;
-    font-size: 15px;
-    line-height: 1.4;
+    margin-top: 14px;
+    padding: 16px;
+    background: var(--azul-suave);
+    border-radius: 10px;
+    color: var(--cinza-texto);
+    font-size: 14px;
+    line-height: 1.8;
+    border-left: 3px solid var(--azul-claro);
 }
 
 .like-btn {
-    margin-top: 15px;
-    padding: 10px 18px;
-    background: #fff;
-    border: 1px solid var(--cinza-borda);
+    margin-top: 18px;
+    padding: 11px 22px;
+    background: white;
+    border: 2px solid var(--azul-medio);
     border-radius: 25px;
     cursor: pointer;
     font-size: 15px;
+    font-weight: 600;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    transition: 0.25s;
-    color: var(--azul-escuro);
+    gap: 8px;
+    transition: all 0.3s ease;
+    color: var(--azul-medio);
 }
 
 .like-btn:hover {
-    background: var(--azul);
-    border-color: var(--azul);
-    color: #fff;
+    background: var(--azul-medio);
+    border-color: var(--azul-medio);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 95, 255, 0.3);
+}
+
+.like-btn:active {
+    transform: scale(0.95);
 }
 
 .like-btn.liked {
-    background: var(--azul);
-    border-color: var(--azul);
-    color: #fff;
-    transform: scale(1.05);
+    background: linear-gradient(135deg, var(--azul-medio) 0%, var(--azul-claro) 100%);
+    border-color: var(--azul-medio);
+    color: white;
+    box-shadow: 0 4px 12px rgba(30, 95, 255, 0.3);
 }
 
+/* Paginação */
 #paginacao {
     display: flex;
     justify-content: center;
-    margin-top: 30px;
-    gap: 12px;
+    margin-top: 40px;
+    gap: 14px;
 }
 
 #paginacao button {
-    padding: 10px 16px;
-    border-radius: 6px;
-    background: var(--azul);
+    padding: 12px 24px;
+    border-radius: 10px;
+    background: var(--azul-medio);
     color: white;
     border: none;
     cursor: pointer;
     font-size: 15px;
-    transition: 0.2s;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(30, 95, 255, 0.2);
 }
 
 #paginacao button:hover {
     background: var(--azul-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(30, 95, 255, 0.3);
+}
+
+#paginacao button:active {
+    transform: translateY(0);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    body {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 26px;
+        margin-bottom: 25px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .titulo {
+        font-size: 18px;
+    }
+
+    #importar-form {
+        padding: 20px;
+    }
 }
