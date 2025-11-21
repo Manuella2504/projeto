@@ -2,31 +2,250 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Criar Atividade | SAEPSaúde</title>
-    <link rel="stylesheet" href="views/styles/criar_atividade.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        #card {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            border-radius: 16px;
+            border: 2px solid #1976d2;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #0d47a1;
+            font-size: 2em;
+            font-weight: 700;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(135deg, #0d47a1 0%, #01579b 100%);
+            border-radius: 2px;
+            margin-left: -30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #01579b;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 10px;
+            border: 2px solid #1976d2;
+            font-size: 0.95em;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            background-color: #ffffff;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #0d47a1;
+            background-color: #f8fbff;
+        }
+
+        input::placeholder {
+            color: #90a4ae;
+        }
+
+        select {
+            cursor: pointer;
+            color: #333;
+        }
+
+        select option {
+            padding: 10px;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #0d47a1 0%, #01579b 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 25px;
+            font-size: 1.05em;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #01579b 0%, #1a237e 100%);
+        }
+
+        button:active {
+            opacity: 0.9;
+        }
+
+        #erro {
+            margin-top: 20px;
+            padding: 14px;
+            color: #c62828;
+            background-color: #ffebee;
+            border: 2px solid #ef5350;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            font-weight: 500;
+        }
+
+        #sucesso {
+            margin-top: 20px;
+            padding: 14px;
+            color: #2e7d32;
+            background-color: #e8f5e9;
+            border: 2px solid #66bb6a;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            font-weight: 500;
+        }
+
+        .icon-input {
+            position: relative;
+        }
+
+        .icon-input::before {
+            content: attr(data-icon);
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #0d47a1;
+            font-weight: 600;
+            pointer-events: none;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #0d47a1;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .back-link a:hover {
+            color: #01579b;
+        }
+
+        @media (max-width: 600px) {
+            #card {
+                padding: 30px 25px;
+            }
+
+            h2 {
+                font-size: 1.6em;
+            }
+
+            .input-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
 
 <div id="card">
     <h2>Criar Atividade</h2>
 
-    <input id="titulo" type="text" placeholder="Título da atividade">
+    <div class="form-group">
+        <label for="titulo">Título da Atividade</label>
+        <input id="titulo" type="text" placeholder="Ex: Corrida matinal no parque">
+    </div>
 
-    <select id="tipo">
-        <option value="">Selecione o tipo</option>
-        <option value="corrida">Corrida</option>
-        <option value="caminhada">Caminhada</option>
-        <option value="trilha">Trilha</option>
-    </select>
+    <div class="form-group">
+        <label for="tipo">Tipo de Atividade</label>
+        <select id="tipo">
+            <option value="">Selecione o tipo</option>
+            <option value="corrida">🏃 Corrida</option>
+            <option value="caminhada">🚶 Caminhada</option>
+            <option value="trilha">⛰️ Trilha</option>
+        </select>
+    </div>
 
-    <input id="distancia" type="number" placeholder="Distância (em metros)">
-    <input id="duracao" type="number" placeholder="Duração (em minutos)">
-    <input id="calorias" type="number" placeholder="Calorias gastas">
+    <div class="input-group">
+        <div class="form-group">
+            <label for="distancia">Distância</label>
+            <div class="icon-input" data-icon="m">
+                <input id="distancia" type="number" placeholder="Ex: 5000">
+            </div>
+        </div>
 
-    <button onclick="criar()">Salvar</button>
+        <div class="form-group">
+            <label for="duracao">Duração</label>
+            <div class="icon-input" data-icon="min">
+                <input id="duracao" type="number" placeholder="Ex: 30">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="calorias">Calorias Gastas</label>
+        <div class="icon-input" data-icon="kcal">
+            <input id="calorias" type="number" placeholder="Ex: 250">
+        </div>
+    </div>
+
+    <button onclick="criar()">Salvar Atividade</button>
 
     <p id="erro"></p>
     <p id="sucesso"></p>
+
+    <div class="back-link">
+        <a href="atividades.html">← Voltar para atividades</a>
+    </div>
 </div>
 
 <script>
@@ -44,7 +263,7 @@
         sucessoDiv.style.display = "none";
 
         if (!titulo || !tipo || !distancia || !duracao || !calorias) {
-            erroDiv.innerText = "Preencha todos os campos.";
+            erroDiv.innerText = "⚠️ Por favor, preencha todos os campos.";
             erroDiv.style.display = "block";
             return;
         }
@@ -52,7 +271,7 @@
         const token = localStorage.getItem("token");
 
         if (!token) {
-            erroDiv.innerText = "Você precisa estar logado.";
+            erroDiv.innerText = "🔒 Você precisa estar logado para criar atividades.";
             erroDiv.style.display = "block";
             return;
         }
@@ -78,12 +297,12 @@
             const json = await resp.json();
 
             if (!resp.ok) {
-                erroDiv.innerText = json.erro || "Erro ao salvar.";
+                erroDiv.innerText = "❌ " + (json.erro || "Erro ao salvar atividade.");
                 erroDiv.style.display = "block";
                 return;
             }
 
-            sucessoDiv.innerText = "Atividade criada com sucesso!";
+            sucessoDiv.innerText = "✅ Atividade criada com sucesso!";
             sucessoDiv.style.display = "block";
 
             setTimeout(() => {
@@ -91,7 +310,7 @@
             }, 1500);
 
         } catch (e) {
-            erroDiv.innerText = "Erro ao conectar ao servidor.";
+            erroDiv.innerText = "🌐 Erro ao conectar ao servidor. Tente novamente.";
             erroDiv.style.display = "block";
         }
     }

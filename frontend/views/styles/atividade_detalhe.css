@@ -38,7 +38,6 @@
         .like {
             font-size: 26px;
             cursor: pointer;
-            user-select: none;
             margin-top: 10px;
         }
 

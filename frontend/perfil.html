@@ -2,71 +2,110 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil | SAEPSaúde</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="views/styles/perfil.css">
 </head>
 <body>
 
-<div id="card">
+<div id="app">
 
-    <p id="erro"></p>
-    <img id="avatar" src="" alt="Avatar">
-    <h2 id="nome"></h2>
-    <p id="email"></p>
+    <!-- COLUNA DO PERFIL -->
+    <aside id="profile-column">
+        <div id="profile-content">
+            <img class="profile-img" id="user-avatar" src="assets/images/SAEPSaude.png" alt="Avatar">
+            <p class="profile-name" id="user-name">Carregando...</p>
 
-    <div id="stats">
-        <p><strong>Total de atividades:</strong> <span id="atividades"></span></p>
-        <p><strong>Total de calorias:</strong> <span id="calorias"></span></p>
-    </div>
+            <div class="stats-container">
+                <div class="stat">
+                    <span id="qtd-atividades-empresa" class="stat-number">0</span>
+                    <span class="stat-label">Atividades</span>
+                </div>
+                <div class="stat">
+                    <span id="qtd-calorias-empresa" class="stat-number">0</span>
+                    <span class="stat-label">Calorias</span>
+                </div>
+            </div>
 
-    <button onclick="logout()">Sair</button>
+            <button id="activity-button" disabled onclick="window.location.href='criar_atividade.html'">
+                <img src="assets/icons/icone_atividade.svg" alt="Atividade">
+                Criar Atividade
+            </button>
+        </div>
+
+        <div id="footer-column">
+            <p>SAEPSaúde</p>
+            <div class="social-icons">
+                <img src="assets/icons/Instagram.svg" alt="Instagram">
+                <img src="assets/icons/Twitter.svg" alt="Twitter">
+                <img src="assets/icons/TikTok.svg" alt="TikTok">
+            </div>
+            <p>Copyright 2025/2026</p>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main id="main-content">
+
+        <header id="main-header">
+            <button id="logout-button" onclick="logout()">Sair</button>
+        </header>
+
+  
+        <section id="filters-session">
+            <button class="filter-btn" data-type="corrida" onclick="filterActivities('corrida')">Corrida</button>
+            <button class="filter-btn" data-type="caminhada" onclick="filterActivities('caminhada')">Caminhada</button>
+            <button class="filter-btn" data-type="trilha" onclick="filterActivities('trilha')">Trilha</button>
+        </section>
+
+    
+        <section id="activities-list">
+            <!-- CARDS SERÃO GERADOS VIA JS -->
+        </section>
+
+        <!-- PAGINAÇÃO -->
+        <section id="pagination-session">
+            <button id="prev-btn" onclick="goToPage('prev')" disabled>Anterior</button>
+            <div id="page-numbers"></div>
+            <button id="next-btn" onclick="goToPage('next')">Próxima</button>
+        </section>
+
+    </main>
 </div>
 
+<!-- MODAL LOGIN -->
+<div id="login-modal" class="modal">
+    <div class="modal-content">
 
-<script>
-    async function carregarPerfil() {
-        const token = localStorage.getItem("token");
-        const erroDiv = document.getElementById("erro");
+        <span class="close-btn" onclick="closeModal('login-modal')">
+            <img src="assets/icons/x.svg">
+        </span>
 
-        if (!token) {
-            window.location.href = "login.html";
-            return;
-        }
+        <div class="modal-header">
+            <h3>Login</h3>
+        </div>
 
-        try {
-            const resp = await fetch("http://localhost:3000/usuarios/perfil", {
-                headers: { "Authorization": "Bearer " + token }
-            });
+        <form id="login-form">
+            <label>Email</label>
+            <input type="email" id="email">
 
-            const dados = await resp.json();
+            <label>Senha</label>
+            <input type="password" id="senha">
 
-            if (!resp.ok) {
-                erroDiv.style.display = "block";
-                erroDiv.innerText = "Sessão expirada. Faça login novamente.";
-                setTimeout(() => window.location.href = "login.html", 2000);
-                return;
-            }
+            <p id="login-error-message" class="error-message"></p>
 
-            document.getElementById("avatar").src = dados.avatar_url || "https://i.imgur.com/qaZr5Sw.png";
-            document.getElementById("nome").innerText = dados.nome_usuario;
-            document.getElementById("email").innerText = dados.email_usuario;
-            document.getElementById("atividades").innerText = dados.total_atividades;
-            document.getElementById("calorias").innerText = dados.total_calorias;
+            <div class="modal-actions">
+                <button type="button" class="cancel-btn" onclick="closeModal('login-modal')">Cancelar</button>
+                <button type="submit" class="login-btn">Login</button>
+            </div>
+        </form>
 
-        } catch (e) {
-            erroDiv.style.display = "block";
-            erroDiv.innerText = "Erro ao conectar ao servidor.";
-        }
-    }
+    </div>
+</div>
 
-    function logout() {
-        localStorage.removeItem("token");
-        window.location.href = "login.html";
-    }
-
-    carregarPerfil();
-</script>
-
+<script src="views/scripts/perfil.js"></script>
 <script src="views/scripts/sidebar.js"></script>
 
 </body>

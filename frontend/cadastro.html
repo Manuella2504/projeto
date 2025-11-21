@@ -13,12 +13,17 @@
     <input id="nome" type="text" placeholder="Nome completo">
     <input id="email" type="email" placeholder="Email">
     <input id="senha" type="password" placeholder="Senha">
-    <input id="avatar" type="text" placeholder="URL do avatar (opcional)">
+    <input id="confirmarSenha" type="password" placeholder="Confirmar senha">
+    <input id="avatar" type="text" placeholder="URL da foto (opcional)">
 
     <button onclick="cadastrar()">Cadastrar</button>
 
     <p id="erro"></p>
     <p id="sucesso"></p>
+
+    <p class="login-link">
+        Já possui conta? <a href="login.html">Fazer login</a>
+    </p>
 </div>
 
 <script>
@@ -26,49 +31,61 @@
         const nome = document.getElementById("nome").value.trim();
         const email = document.getElementById("email").value.trim();
         const senha = document.getElementById("senha").value.trim();
-        const avatar_url = document.getElementById("avatar").value.trim();
+        const confirmarSenha = document.getElementById("confirmarSenha").value.trim();
+        const avatar = document.getElementById("avatar").value.trim();
 
-        const erroDiv = document.getElementById("erro");
-        const sucessoDiv = document.getElementById("sucesso");
-        erroDiv.style.display = "none";
-        sucessoDiv.style.display = "none";
+        const erro = document.getElementById("erro");
+        const sucesso = document.getElementById("sucesso");
 
-        if (!nome || !email || !senha) {
-            erroDiv.innerText = "Preencha todos os campos obrigatórios.";
-            erroDiv.style.display = "block";
+        erro.style.display = "none";
+        sucesso.style.display = "none";
+
+        if (!nome || !email || !senha || !confirmarSenha) {
+            erro.innerText = "Preencha todos os campos obrigatórios.";
+            erro.style.display = "block";
             return;
         }
 
-        const dados = { nome_usuario: nome, email_usuario: email, senha_usuario: senha, avatar_url };
+        if (senha !== confirmarSenha) {
+            erro.innerText = "As senhas não são iguais.";
+            erro.style.display = "block";
+            return;
+        }
 
         try {
             const resp = await fetch("http://localhost:3000/usuarios/cadastrar", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(dados)
+                body: JSON.stringify({
+                    nome_usuario: nome,
+                    email_usuario: email,
+                    senha_usuario: senha,
+                    avatar_url: avatar || null
+                })
             });
 
-            const json = await resp.json();
+            const dados = await resp.json();
 
             if (!resp.ok) {
-                erroDiv.innerText = json.erro || "Erro ao cadastrar.";
-                erroDiv.style.display = "block";
+                erro.innerText = dados.erro || "Erro ao cadastrar.";
+                erro.style.display = "block";
                 return;
             }
 
-            sucessoDiv.innerText = "Conta criada com sucesso! Redirecionando...";
-            sucessoDiv.style.display = "block";
+            sucesso.innerText = "Cadastro realizado com sucesso!";
+            sucesso.style.display = "block";
 
             setTimeout(() => {
                 window.location.href = "login.html";
             }, 1500);
 
-        } catch (e) {
-            erroDiv.innerText = "Erro ao conectar ao servidor.";
-            erroDiv.style.display = "block";
+        } catch (error) {
+            erro.innerText = "Erro ao conectar ao servidor.";
+            erro.style.display = "block";
         }
     }
 </script>
 <script src="views/scripts/header.js"></script>
+
 </body>
 </html>

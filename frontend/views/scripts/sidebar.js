@@ -41,10 +41,14 @@
             color: white;
         }
         #logout {
-            margin-top: auto;
-            background: #e63946;
-            text-align: center;
-            color: white !important;
+            padding: 14px 26px;
+            border-radius: 10px;
+            font-size: 1em;
+            background: linear-gradient(135deg, #0d47a1 0%, #01579b 100%);
+            color: #FFFFFF;
+            border: 2px solid #0d47a1;
+            align-items: center;
+   
         }
         .conteudo {
             margin-left: 260px;

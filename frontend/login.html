@@ -4,18 +4,23 @@
     <meta charset="UTF-8">
     <title>Login | SAEPSaúde</title>
     <link rel="stylesheet" href="views/styles/login.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
 </head>
 <body>
 
 <div id="container">
-    <h2>Entrar no SAEPSaúde</h2>
+    <h2>Bem-vindo ao <span>SAEPSaúde</span></h2>
 
-    <input id="email" type="email" placeholder="Email">
-    <input id="senha" type="password" placeholder="Senha">
+    <input id="email" type="email" placeholder="Digite seu email">
+    <input id="senha" type="password" placeholder="Digite sua senha">
 
     <button onclick="login()">Entrar</button>
 
     <p id="erro"></p>
+
+    <p class="link-cadastro">
+        Não tem conta? <a href="cadastro.html">Criar conta</a>
+    </p>
 </div>
 
 <script>

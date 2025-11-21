@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Atividades | SAEPSaúde</title>
-   <link rel="stylesheet" href="views/styles/atividade.css">
+    <link rel="stylesheet" href="views/styles/atividade.css">
 </head>
 <body>
 
@@ -69,7 +69,9 @@
                     Calorias: ${a.calorias}
                 </div>
 
-                <div class="like" onclick="curtir(${a.id_atividade}, this)">❤</div>
+                <button class="like-btn" onclick="curtir(${a.id_atividade}, this)">
+                    <span>❤️ Curtir</span>
+                </button>
             `;
 
             lista.appendChild(card);
@@ -101,6 +103,8 @@
 
     carregarAtividades(1);
 </script>
+
 <script src="views/scripts/sidebar.js"></script>
+
 </body>
 </html>
